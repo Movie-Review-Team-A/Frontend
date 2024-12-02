@@ -2,7 +2,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import GlobalStyle from "./styles/globalStyles";
-import Upload from "./pages/upload";
 import MovieList from "./pages/MovieList";
 
 function App() {
@@ -10,7 +9,6 @@ function App() {
     <Router>
       <GlobalStyle />
       <Routes>
-        <Route path="/upload" element={<Upload />} />
         <Route path="/list" element={<MovieList />} />
       </Routes>
     </Router>
