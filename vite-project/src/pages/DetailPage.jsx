@@ -3,49 +3,153 @@ import { useState } from "react";
 import styled from "styled-components";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import { deleteMovie, updateMovie } from "../api/movieApi";
 
 const DetailPage = () => {
   const [userRating, setUserRating] = useState(0);
+  const [editMode, setEditMode] = useState(false);
+  const [movieData, setMovieData] = useState({
+    title: "범죄도시 4",
+    genre: "액션",
+    releaseDate: "2024-11-23",
+    endDate: "2024-12-07",
+    screening: true,
+  });
+
+  const movieId = 1;
 
   const handleRatingClick = (index) => {
     setUserRating(index + 1);
   };
 
+  const handleDeleteClick = async () => {
+    try {
+      await deleteMovie(movieId); // deleteMovie API 호출
+      alert("영화가 성공적으로 삭제되었습니다.");
+      // eslint-disable-next-line no-unused-vars
+    } catch (error) {
+      alert("영화 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleEditClick = () => {
+    setEditMode(true);
+  };
+
+  const handleSaveClick = async () => {
+    try {
+      await updateMovie(movieId, { ...movieData, rating: userRating });
+      setEditMode(false);
+      alert("영화가 성공적으로 수정되었습니다.");
+      // eslint-disable-next-line no-unused-vars
+    } catch (error) {
+      alert("영화 수정 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setMovieData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleScreeningChange = () => {
+    setMovieData((prevData) => ({
+      ...prevData,
+      screening: !prevData.screening,
+    }));
+  };
+
   return (
     <Container>
       <Header>
-        <Title>범죄도시 4</Title>
+        <Title>{movieData.title}</Title>
       </Header>
       <Review>
         <Section>
           <Actions>
-            <FiEdit2 />
-            <FiTrash2 />
+            {!editMode ? (
+              <>
+                <FiEdit2 onClick={handleEditClick} />
+                <FiTrash2 onClick={handleDeleteClick} />
+              </>
+            ) : (
+              <SaveButton onClick={handleSaveClick}>Save</SaveButton>
+            )}
           </Actions>
           <Label>평균 평점</Label>
           <Rating>
             {[...Array(5)].map((_, i) => (
-              <AiOutlineStar key={i} />
+              <StarButton
+                key={i}
+                onClick={() => editMode && handleRatingClick(i)}
+              >
+                {i < userRating ? <AiFillStar /> : <AiOutlineStar />}
+              </StarButton>
             ))}
           </Rating>
         </Section>
         <Section>
           <Label>상영 여부</Label>
-          <StatusTag>상영 중</StatusTag>
+          {editMode ? (
+            <Checkbox
+              type="checkbox"
+              checked={movieData.screening}
+              onChange={handleScreeningChange}
+            />
+          ) : (
+            <StatusTag>
+              {movieData.screening ? "상영 중" : "상영 종료"}
+            </StatusTag>
+          )}
         </Section>
         <Section>
           <Label>장르</Label>
-          <GenreTag>액션</GenreTag>
+          {editMode ? (
+            <Select
+              name="genre"
+              value={movieData.genre}
+              onChange={handleInputChange}
+            >
+              <option value="액션">액션</option>
+              <option value="코미디">코미디</option>
+              <option value="드라마">드라마</option>
+              <option value="스릴러">스릴러</option>
+            </Select>
+          ) : (
+            <GenreTag>{movieData.genre}</GenreTag>
+          )}
         </Section>
         <Section>
           <Label>개봉일</Label>
-          <Input type="text" value="2024. 11. 23." readOnly />
+          {editMode ? (
+            <Input
+              type="date"
+              name="releaseDate"
+              value={movieData.releaseDate}
+              onChange={handleInputChange}
+            />
+          ) : (
+            <Input type="text" value={movieData.releaseDate} readOnly />
+          )}
         </Section>
         <Section>
           <Label>상영 종료일</Label>
-          <Input type="text" value="2024. 12. 07." readOnly />
+          {editMode ? (
+            <Input
+              type="date"
+              name="endDate"
+              value={movieData.endDate}
+              onChange={handleInputChange}
+            />
+          ) : (
+            <Input type="text" value={movieData.endDate} readOnly />
+          )}
         </Section>
       </Review>
+
       <Review>
         <ReviewSection>
           <Rating>
@@ -110,7 +214,14 @@ const Actions = styled.div`
   width: 100%;
   justify-content: flex-end;
 `;
-
+const SaveButton = styled.button`
+  background: #5b3cc4;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+`;
 const Section = styled.div`
   margin-bottom: 15px;
 `;
@@ -153,6 +264,16 @@ const GenreTag = styled.div`
 `;
 
 const Input = styled.input`
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
+const Checkbox = styled.input`
+  width: 20px;
+  height: 20px;
+`;
+
+const Select = styled.select`
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
