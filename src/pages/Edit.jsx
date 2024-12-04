@@ -1,20 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
 
 function Edit() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [movieData, setMovieData] = useState({
-    title: '',
-    director: '',
-    releaseDate: '',
-    genre: '',
-    description: ''
+    title: '범죄도시 4',
+    status: '상영 중',
+    genre: '액션',
+    releaseDate: '2024. 11. 23.',
+    endDate: '2024. 12. 07.'
   });
-
-  useEffect(() => {
-    // 여기에 나중에 백엔드 API 호출 코드가 들어갈 예정
-    // 예: fetchMovieData(id)
-  }, [id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -27,85 +24,99 @@ function Edit() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('수정된 영화:', movieData);
-    // 여기에 나중에 백엔드로 수정된 데이터를 보내는 코드가 들어갈 예정
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4">
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-8">
-        <h1 className="text-2xl font-bold mb-6">영화 정보 수정</h1>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="min-h-screen bg-[#F7F7F7] p-8">
+      <div className="max-w-[600px] mx-auto bg-white rounded-3xl p-8 shadow-sm">
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-2xl font-bold">Edit Movie</h1>
+          <button 
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 bg-[#6A52FE] text-white px-4 py-2 rounded-lg"
+          >
+            <X size={16} />
+            Cancel
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-8">
           <div>
-            <label className="block text-gray-700 mb-2">영화 제목</label>
+            <label className="block text-base font-medium mb-2">영화 제목</label>
             <input
               type="text"
               name="title"
               value={movieData.title}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#6A52FE]"
               required
             />
           </div>
 
           <div>
-            <label className="block text-gray-700 mb-2">감독</label>
-            <input
-              type="text"
-              name="director"
-              value={movieData.director}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 mb-2">개봉일</label>
-            <input
-              type="date"
-              name="releaseDate"
-              value={movieData.releaseDate}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 mb-2">장르</label>
+            <label className="block text-base font-medium mb-2">상영 여부</label>
             <select
-              name="genre"
-              value={movieData.genre}
+              name="status"
+              value={movieData.status}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
-              required
+              className="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#6A52FE] appearance-none bg-white"
             >
-              <option value="">장르 선택</option>
-              <option value="action">액션</option>
-              <option value="comedy">코미디</option>
-              <option value="drama">드라마</option>
-              <option value="horror">호러</option>
-              <option value="romance">로맨스</option>
+              <option value="상영 중">상영 중</option>
+              <option value="상영 예정">상영 예정</option>
+              <option value="상영 종료">상영 종료</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-gray-700 mb-2">영화 설명</label>
-            <textarea
-              name="description"
-              value={movieData.description}
+            <label className="block text-base font-medium mb-2">장르</label>
+            <select
+              name="genre"
+              value={movieData.genre}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded h-32"
-              required
-            />
+              className="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#6A52FE] appearance-none bg-white"
+            >
+              <option value="액션">액션</option>
+              <option value="스릴러">스릴러</option>
+              <option value="로맨스">로맨스</option>
+              <option value="코미디">코미디</option>
+            </select>
+          </div>
+
+          <div className="flex gap-6">
+            <div className="flex-1">
+              <label className="block text-base font-medium mb-2">개봉일</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  name="releaseDate"
+                  value={movieData.releaseDate}
+                  onChange={handleInputChange}
+                  className="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#6A52FE]"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex-1">
+              <label className="block text-base font-medium mb-2">상영 종료일</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  name="endDate"
+                  value={movieData.endDate}
+                  onChange={handleInputChange}
+                  className="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#6A52FE]"
+                  required
+                />
+              </div>
+            </div>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+            className="w-full bg-[#6A52FE] text-white py-4 rounded-lg mt-8 hover:bg-[#5842fe] font-medium"
           >
-            수정 완료
+            Update Movie
           </button>
         </form>
       </div>
