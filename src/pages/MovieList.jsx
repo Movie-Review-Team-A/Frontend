@@ -3,12 +3,49 @@ import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { BsPlusCircle } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { fetchMovies } from "../api/movieApi"; // fetchMovies 함수 임포트
 
 const MovieList = () => {
-  const navigate = useNavigate(); // 네비게이션 함수
+  const navigate = useNavigate();
+  const [movies, setMovies] = useState([]);
+  const [genreFilter, setGenreFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [ratingFilter, setRatingFilter] = useState("All");
+
+  useEffect(() => {
+    const getMovies = async () => {
+      try {
+        const params = {};
+        if (genreFilter !== "All") params.genre = genreFilter;
+        if (statusFilter !== "All") {
+          // 문자열 값을 실제 boolean 값으로 변환
+          params.isScreening = statusFilter === "true";
+        }
+
+        const data = await fetchMovies(
+          params.genre || null,
+          params.isScreening || null
+        ); // API 호출
+        setMovies(data);
+      } catch (error) {
+        console.error("영화 데이터를 가져오는 중 오류 발생:", error);
+        alert("영화 데이터를 가져오는 데 실패했습니다.");
+      }
+    };
+
+    getMovies();
+  }, [genreFilter, statusFilter]);
+
+  // 평점 필터링 로직
+  const filteredMovies = movies.filter((movie) => {
+    const matchesRating =
+      ratingFilter === "All" || movie.rating >= Number(ratingFilter);
+    return matchesRating;
+  });
 
   const handleAddMovieClick = () => {
-    navigate("/upload"); // /upload 페이지로 이동
+    navigate("/upload");
   };
 
   return (
@@ -20,15 +57,38 @@ const MovieList = () => {
         </AddMovieButton>
       </Header>
       <FilterBar>
-        <FilterDropdown>
-          <option>All Genres</option>
+        <FilterDropdown
+          value={genreFilter}
+          onChange={(e) => setGenreFilter(e.target.value)}
+        >
+          <option value="All">All Genres</option>
+          <option value="THRILLER">스릴러</option>
+          <option value="ROMANCE">로맨스</option>
+          <option value="COMEDY">코믹</option>
+          <option value="ACTION">액션</option>
         </FilterDropdown>
-        <FilterDropdown>
-          <option>All Ratings</option>
+        <FilterDropdown
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="All">All Status</option>
+          <option value="true">상영 중</option>
+          <option value="false">상영 종료</option>
+        </FilterDropdown>
+        <FilterDropdown
+          value={ratingFilter}
+          onChange={(e) => setRatingFilter(e.target.value)}
+        >
+          <option value="All">All Ratings</option>
+          <option value="5">5점 이상</option>
+          <option value="4">4점 이상</option>
+          <option value="3">3점 이상</option>
+          <option value="2">2점 이상</option>
+          <option value="1">1점 이상</option>
         </FilterDropdown>
       </FilterBar>
       <MovieCardList>
-        {movies.map((movie, index) => (
+        {filteredMovies.map((movie, index) => (
           <MovieCard key={index}>
             <MovieInfo>
               <MovieTitle>{movie.title}</MovieTitle>
@@ -44,7 +104,9 @@ const MovieList = () => {
             </MovieInfo>
             <Tags>
               <GenreTag>{movie.genre}</GenreTag>
-              <StatusTag>{movie.status}</StatusTag>
+              <StatusTag>
+                {movie.isScreening ? "상영 중" : "상영 종료"}
+              </StatusTag>
             </Tags>
             <Actions>
               <FiEdit2 />
@@ -56,19 +118,6 @@ const MovieList = () => {
     </Container>
   );
 };
-
-const movies = [
-  { title: "범죄도시 4", rating: 4, genre: "액션", status: "상영 중" },
-  { title: "스물", rating: 5, genre: "코미디", status: "상영 중" },
-  { title: "히든페이스", rating: 3, genre: "스릴러", status: "상영 중" },
-  {
-    title: "말할 수 없는 비밀",
-    rating: 2,
-    genre: "로맨스",
-    status: "상영 종료",
-  },
-  { title: "장산범", rating: 0, genre: "스릴러", status: "상영 종료" },
-];
 
 const Container = styled.div`
   width: 100%;

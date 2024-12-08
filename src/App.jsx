@@ -10,7 +10,7 @@ function App() {
     <Router>
       <GlobalStyle />
       <Routes>
-        <Route path="/list" element={<MovieList />} />
+        <Route path="" element={<MovieList />} />
         <Route path="/detail" element={<DetailPage />} />
       </Routes>
     </Router>
