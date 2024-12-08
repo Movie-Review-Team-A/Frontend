@@ -2,20 +2,24 @@ import styled from "styled-components";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { BsPlusCircle } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
 const MovieList = () => {
+  const navigate = useNavigate(); // 네비게이션 함수
+
+  const handleAddMovieClick = () => {
+    navigate("/upload"); // /upload 페이지로 이동
+  };
+
   return (
     <Container>
       <Header>
         <Title>Movie List</Title>
-        <AddMovieButton>
+        <AddMovieButton onClick={handleAddMovieClick}>
           <BsPlusCircle size={20} /> Add Movie
         </AddMovieButton>
       </Header>
       <FilterBar>
-        <FilterDropdown>
-          <option>All Movies</option>
-        </FilterDropdown>
         <FilterDropdown>
           <option>All Genres</option>
         </FilterDropdown>
