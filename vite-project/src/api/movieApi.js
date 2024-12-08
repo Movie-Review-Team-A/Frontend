@@ -15,9 +15,19 @@ export const fetchMovies = async (genre, isScreening) => {
   }
 };
 
-export const deleteMovie = async (movieId) => {
+export const fetchMovieDetails = async (id) => {
   try {
-    const response = await jsonAxios.delete(`/movies/${movieId}`);
+    const response = await jsonAxios.get(`/movies/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("영화 상세 조회 중 오류 발생:", error);
+    throw error;
+  }
+};
+
+export const deleteMovie = async (id) => {
+  try {
+    const response = await jsonAxios.delete(`/movies/${id}`);
     return response.data;
   } catch (error) {
     console.error("영화 삭제 중 오류 발생:", error);

@@ -1,22 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import styled from "styled-components";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
-import { deleteMovie, updateMovie } from "../api/movieApi";
+import { fetchMovieDetails, deleteMovie, updateMovie } from "../api/movieApi";
 
 const DetailPage = () => {
   const [userRating, setUserRating] = useState(0);
   const [editMode, setEditMode] = useState(false);
-  const [movieData, setMovieData] = useState({
-    title: "범죄도시 4",
-    genre: "액션",
-    releaseDate: "2024-11-23",
-    endDate: "2024-12-07",
-    screening: true,
-  });
+  const [movieData, setMovieData] = useState(null);
+  const id = 1;
 
-  const movieId = 1;
+  useEffect(() => {
+    const getMovieDetails = async () => {
+      try {
+        const data = await fetchMovieDetails(id);
+        setMovieData(data);
+        setUserRating(data.averageRating || 0); // 초기 평점 설정
+      } catch (error) {
+        console.error("영화 상세 조회 중 오류 발생:", error);
+        alert("영화 정보를 불러오는 데 실패했습니다.");
+      }
+    };
+
+    getMovieDetails();
+  }, [id]);
 
   const handleRatingClick = (index) => {
     setUserRating(index + 1);
@@ -24,7 +32,7 @@ const DetailPage = () => {
 
   const handleDeleteClick = async () => {
     try {
-      await deleteMovie(movieId); // deleteMovie API 호출
+      await deleteMovie(id); // deleteMovie API 호출
       alert("영화가 성공적으로 삭제되었습니다.");
       // eslint-disable-next-line no-unused-vars
     } catch (error) {
@@ -38,7 +46,7 @@ const DetailPage = () => {
 
   const handleSaveClick = async () => {
     try {
-      await updateMovie(movieId, { ...movieData, rating: userRating });
+      await updateMovie(id, { ...movieData, rating: userRating });
       setEditMode(false);
       alert("영화가 성공적으로 수정되었습니다.");
       // eslint-disable-next-line no-unused-vars
@@ -61,6 +69,10 @@ const DetailPage = () => {
       screening: !prevData.screening,
     }));
   };
+
+  if (!movieData) {
+    return <div>로딩 중...</div>;
+  }
 
   return (
     <Container>
