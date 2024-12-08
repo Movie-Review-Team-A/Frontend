@@ -8,6 +8,8 @@ export const fetchMovies = async (genre, isScreening) => {
         isScreening: isScreening,
       },
     });
+    console.log();
+     response.data
     return response.data;
   } catch (error) {
     console.error("영화 조회 오류발생:", error);
