@@ -3,25 +3,37 @@ import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { BsPlusCircle } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { fetchMoviesByRating } from "./movieApi"; // 평점순 API 호출 함수
 
 const MovieList = () => {
   const navigate = useNavigate();
-  const [genreFilter, setGenreFilter] = useState("All"); // 장르 필터 상태
-  const [statusFilter, setStatusFilter] = useState("All"); // 상영 여부 필터 상태
+  const [movies, setMovies] = useState([]); // 서버에서 가져온 영화 데이터
+  const [ratingFilter, setRatingFilter] = useState("All"); // 평점 필터 상태
+
+  useEffect(() => {
+    // 평점 순으로 영화 목록을 가져오는 함수
+    const getMovies = async () => {
+      try {
+        const data = await fetchMoviesByRating(0); // 기본값: 평점순 정렬
+        setMovies(data);
+      } catch (error) {
+        console.error("영화 목록을 가져오는 중 오류 발생:", error);
+        alert("영화 목록을 가져오는 데 실패했습니다.");
+      }
+    };
+
+    getMovies();
+  }, []);
+
+  // 평점 필터링 로직
+  const filteredMovies = movies.filter((movie) => {
+    return ratingFilter === "All" || movie.rating === Number(ratingFilter);
+  });
 
   const handleAddMovieClick = () => {
     navigate("/upload");
   };
-
-  const filteredMovies = movies.filter((movie) => {
-    const matchesGenre = genreFilter === "All" || movie.genre === genreFilter;
-    const matchesStatus =
-      statusFilter === "All" ||
-      (statusFilter === "상영 중" && movie.status === "상영 중") ||
-      (statusFilter === "상영 종료" && movie.status === "상영 종료");
-    return matchesGenre && matchesStatus;
-  });
 
   return (
     <Container>
@@ -33,22 +45,16 @@ const MovieList = () => {
       </Header>
       <FilterBar>
         <FilterDropdown
-          value={genreFilter}
-          onChange={(e) => setGenreFilter(e.target.value)}
+          value={ratingFilter}
+          onChange={(e) => setRatingFilter(e.target.value)}
         >
-          <option value="All">All Genres</option>
-          <option value="스릴러">스릴러</option>
-          <option value="로맨스">로맨스</option>
-          <option value="코믹">코믹</option>
-          <option value="액션">액션</option>
-        </FilterDropdown>
-        <FilterDropdown
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="All">All Status</option>
-          <option value="상영 중">상영 중</option>
-          <option value="상영 종료">상영 종료</option>
+          <option value="All">모든 평점</option>
+          <option value="5">5점</option>
+          <option value="4">4점</option>
+          <option value="3">3점</option>
+          <option value="2">2점</option>
+          <option value="1">1점</option>
+          <option value="0">0점</option>
         </FilterDropdown>
       </FilterBar>
       <MovieCardList>
@@ -80,19 +86,6 @@ const MovieList = () => {
     </Container>
   );
 };
-
-const movies = [
-  { title: "범죄도시 4", rating: 4, genre: "액션", status: "상영 중" },
-  { title: "스물", rating: 5, genre: "코믹", status: "상영 중" },
-  { title: "히든페이스", rating: 3, genre: "스릴러", status: "상영 중" },
-  {
-    title: "말할 수 없는 비밀",
-    rating: 2,
-    genre: "로맨스",
-    status: "상영 종료",
-  },
-  { title: "장산범", rating: 0, genre: "스릴러", status: "상영 종료" },
-];
 
 const Container = styled.div`
   width: 100%;
