@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FiTrash2 } from "react-icons/fi";
 import { BsPlusCircle } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { fetchMovies } from "../api/movieApi"; // fetchMovies 함수 임포트
+import { fetchMovies, deleteMovie } from "../api/movieApi"; // fetchMovies 함수 임포트
 
 const MovieList = () => {
   const navigate = useNavigate();
@@ -48,6 +48,22 @@ const MovieList = () => {
     navigate("/upload");
   };
 
+  const handleMovieClick = (id) => {
+    console.log("Navigating to detail page with ID:", id); // 디버깅 로그
+    navigate(`/detail/${id}`);
+  };
+
+  const handleDeleteClick = async (id) => {
+    try {
+      await deleteMovie(id); // deleteMovie API 호출
+      alert("영화가 성공적으로 삭제되었습니다.");
+      // 삭제 후, 영화 목록 업데이트
+      setMovies((prevMovies) => prevMovies.filter((movie) => movie.id !== id));
+    } catch (error) {
+      alert("영화 삭제 중 오류가 발생했습니다.");
+      console.error("삭제 오류:", error);
+    }
+  };
   return (
     <Container>
       <Header>
@@ -89,7 +105,7 @@ const MovieList = () => {
       </FilterBar>
       <MovieCardList>
         {filteredMovies.map((movie, index) => (
-          <MovieCard key={index}>
+          <MovieCard key={index} onClick={() => handleMovieClick(movie.id)}>
             <MovieInfo>
               <MovieTitle>{movie.title}</MovieTitle>
               <Rating>
@@ -109,8 +125,7 @@ const MovieList = () => {
               </StatusTag>
             </Tags>
             <Actions>
-              <FiEdit2 />
-              <FiTrash2 />
+              <FiTrash2 onClick={() => handleDeleteClick(movie.id)} />
             </Actions>
           </MovieCard>
         ))}
@@ -177,6 +192,7 @@ const MovieCard = styled.div`
   border: 1px solid #eee;
   border-radius: 10px;
   background-color: #ffffff;
+  cursor: pointer;
 `;
 
 const MovieInfo = styled.div`

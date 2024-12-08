@@ -10,8 +10,8 @@ function App() {
     <Router>
       <GlobalStyle />
       <Routes>
-        <Route path="" element={<MovieList />} />
-        <Route path="/detail" element={<DetailPage />} />
+        <Route path="/" element={<MovieList />} />
+        <Route path="/detail/:id" element={<DetailPage />} />
       </Routes>
     </Router>
   );

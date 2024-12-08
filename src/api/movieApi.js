@@ -18,10 +18,14 @@ export const fetchMovies = async (genre, isScreening) => {
 
 export const fetchMovieDetails = async (id) => {
   try {
+    console.log("Fetching movie details for ID:", id); // 디버깅용 로그
     const response = await jsonAxios.get(`/movies/${id}`);
     return response.data;
   } catch (error) {
-    console.error("영화 상세 조회 중 오류 발생:", error);
+    console.error(
+      "영화 상세 조회 중 오류 발생:",
+      error.response || error.message
+    );
     throw error;
   }
 };

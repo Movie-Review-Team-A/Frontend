@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { fetchMovieDetails, deleteMovie, updateMovie } from "../api/movieApi";
 
 const DetailPage = () => {
+  const { id } = useParams(); // useParams로 ID 가져오기
   const [userRating, setUserRating] = useState(0);
   const [editMode, setEditMode] = useState(false);
   const [movieData, setMovieData] = useState(null);
-  const id = 1;
 
   useEffect(() => {
     const getMovieDetails = async () => {
@@ -125,10 +125,10 @@ const DetailPage = () => {
               value={movieData.genre}
               onChange={handleInputChange}
             >
-              <option value="액션">액션</option>
-              <option value="코미디">코미디</option>
-              <option value="드라마">드라마</option>
-              <option value="스릴러">스릴러</option>
+              <option value="ACTION">액션</option>
+              <option value="COMEDY">코미디</option>
+              <option value="ROMANCE">로맨스</option>
+              <option value="THRILLER">스릴러</option>
             </Select>
           ) : (
             <GenreTag>{movieData.genre}</GenreTag>
@@ -258,21 +258,22 @@ const StarButton = styled.button`
 `;
 
 const StatusTag = styled.div`
+  display: inline;
   background: #c3f7c3;
   padding: 5px 10px;
   border-radius: 20px;
   color: #2f8c2f;
   font-size: 14px;
-  width: 44px;
+  width: auto;
 `;
 
 const GenreTag = styled.div`
+  display: inline;
   background: #d0c4ff;
   padding: 5px 10px;
   border-radius: 20px;
   color: #5b3cc4;
   font-size: 14px;
-  width: 28px;
 `;
 
 const Input = styled.input`
