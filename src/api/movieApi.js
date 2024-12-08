@@ -1,4 +1,4 @@
-import { jsonAxios } from "./axios.config.jsx";
+import { jsonAxios } from "./axios.config.js";
 
 export const fetchMovies = async (genre, isScreening) => {
   try {
@@ -8,8 +8,7 @@ export const fetchMovies = async (genre, isScreening) => {
         isScreening: isScreening,
       },
     });
-    console.log();
-     response.data
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("영화 조회 오류발생:", error);
@@ -37,12 +36,9 @@ export const deleteMovie = async (id) => {
   }
 };
 
-export const updateMovie = async (movieId, updatedMovieData) => {
+export const updateMovie = async (id, updatedMovieData) => {
   try {
-    const response = await jsonAxios.put(
-      `/movies/${movieId}`,
-      updatedMovieData
-    );
+    const response = await jsonAxios.put(`/movies/${id}`, updatedMovieData);
     return response.data;
   } catch (error) {
     console.error("영화 수정 중 오류 발생:", error);
