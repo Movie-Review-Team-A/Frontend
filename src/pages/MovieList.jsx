@@ -8,24 +8,26 @@ import { fetchMovies } from "../api/movieApi"; // fetchMovies 함수 임포트
 
 const MovieList = () => {
   const navigate = useNavigate();
-  const [movies, setMovies] = useState([]); // 서버에서 가져온 영화 데이터
-  const [genreFilter, setGenreFilter] = useState("All"); // 장르 필터 상태
-  const [statusFilter, setStatusFilter] = useState("All"); // 상영 여부 필터 상태
-  const [ratingFilter, setRatingFilter] = useState("All"); // 평점 필터 상태
+  const [movies, setMovies] = useState([]);
+  const [genreFilter, setGenreFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [ratingFilter, setRatingFilter] = useState("All");
 
   useEffect(() => {
-    // 서버에서 영화 데이터를 가져오는 함수
     const getMovies = async () => {
       try {
-        const genre = genreFilter === "All" ? null : genreFilter; // All일 경우 null로 전달
-        const isScreening =
-          statusFilter === "All"
-            ? null
-            : statusFilter === "상영 중"
-            ? true
-            : false; // 상태 필터 설정
-        const data = await fetchMovies(genre, isScreening); // API 호출
-        setMovies(data); // 영화 데이터 상태 업데이트
+        const params = {};
+        if (genreFilter !== "All") params.genre = genreFilter;
+        if (statusFilter !== "All") {
+          // 문자열 값을 실제 boolean 값으로 변환
+          params.isScreening = statusFilter === "true";
+        }
+
+        const data = await fetchMovies(
+          params.genre || null,
+          params.isScreening || null
+        ); // API 호출
+        setMovies(data);
       } catch (error) {
         console.error("영화 데이터를 가져오는 중 오류 발생:", error);
         alert("영화 데이터를 가져오는 데 실패했습니다.");
@@ -33,7 +35,7 @@ const MovieList = () => {
     };
 
     getMovies();
-  }, [genreFilter, statusFilter]); // 장르 및 상영 여부 필터 변경 시 데이터 재조회
+  }, [genreFilter, statusFilter]);
 
   // 평점 필터링 로직
   const filteredMovies = movies.filter((movie) => {
@@ -60,18 +62,18 @@ const MovieList = () => {
           onChange={(e) => setGenreFilter(e.target.value)}
         >
           <option value="All">All Genres</option>
-          <option value="스릴러">스릴러</option>
-          <option value="로맨스">로맨스</option>
-          <option value="코믹">코믹</option>
-          <option value="액션">액션</option>
+          <option value="THRILLER">스릴러</option>
+          <option value="ROMANCE">로맨스</option>
+          <option value="COMEDY">코믹</option>
+          <option value="ACTION">액션</option>
         </FilterDropdown>
         <FilterDropdown
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
           <option value="All">All Status</option>
-          <option value="상영 중">상영 중</option>
-          <option value="상영 종료">상영 종료</option>
+          <option value="true">상영 중</option>
+          <option value="false">상영 종료</option>
         </FilterDropdown>
         <FilterDropdown
           value={ratingFilter}
@@ -83,7 +85,6 @@ const MovieList = () => {
           <option value="3">3점 이상</option>
           <option value="2">2점 이상</option>
           <option value="1">1점 이상</option>
-          <option value="0">0점 이상</option>
         </FilterDropdown>
       </FilterBar>
       <MovieCardList>
